@@ -1,5 +1,6 @@
 import { pendingOutbox, markSynced, markFailed, watchPending } from './db';
 import { syncUsage } from './api';
+import { buildSyncPayload } from './payload';
 
 export async function syncNow() {
   const pending = await pendingOutbox();
@@ -8,26 +9,7 @@ export async function syncNow() {
   const errors = [];
 
   for (const row of pending) {
-    let payload = row;
-    if (row.payloadJson) {
-      try {
-        payload = JSON.parse(row.payloadJson);
-      } catch {
-        payload = row;
-      }
-    }
-    const body = {
-      uuid: row.uuid,
-      project_id: payload.projectId ?? row.projectId,
-      warehouse_id: payload.warehouseId ?? row.warehouseId,
-      destination_type: payload.destinationType ?? row.destinationType,
-      destination_id: payload.destinationId ?? row.destinationId,
-      user_id: payload.userId ?? payload.user_id ?? 1,
-      usage_date: payload.usageDate ?? row.usageDate,
-      note: payload.note ?? row.note ?? null,
-      recorded_at: payload.recordedAt ?? row.recordedAt,
-      items: payload.items ?? row.items,
-    };
+    const body = buildSyncPayload(row);
     try {
       await syncUsage(body);
       await markSynced(row.uuid);
