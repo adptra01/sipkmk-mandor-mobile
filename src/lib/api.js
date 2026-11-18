@@ -1,6 +1,7 @@
 // Bisa dioverride saat build: VITE_API_BASE=https://domain/api npm run build
-// Default produksi = backend yang di-deploy di hosting cPanel.
-export const API_BASE = import.meta.env.VITE_API_BASE || 'http://curious-lime-sloth.101-50-1-74.cpanel.site/api';
+// Default produksi = backend di hosting cPanel (WAJIB https: halaman Pages juga https,
+// Mixed Content memblokir request http dari halaman https).
+export const API_BASE = import.meta.env.VITE_API_BASE || 'https://curious-lime-sloth.101-50-1-74.cpanel.site/api';
 
 const TOKEN_KEY = 'sipkmk_token';
 
