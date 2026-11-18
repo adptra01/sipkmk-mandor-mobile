@@ -37,3 +37,22 @@ R2 mengimpor dari R1: `useAuth` (`src/context/AuthContext.jsx`), `db`/helper (`s
 - TIDAK ada approval offline.
 - Jangan install dependency baru (sudah: react, react-dom, react-router-dom, dexie, vite).
 - Pastikan `npm run build` lolos.
+## Deploy Cloudflare Pages (CATATAN PENTING)
+Token Cloudflare yang tersedia punya **IP restriction** — hanya IP lokal (`182.9.226.116`) yang diizinkan.
+IP GitHub Actions dan server cPanel (`101.50.1.74`) ditolak dengan `Authentication error [code: 10000]`.
+Karena itu deploy OTOMATIS lewat GitHub Actions TIDAK bisa dipakai sampai token diganti dengan token tanpa IP restriction.
+
+### Deploy manual dari lokal (working)
+```bash
+cd /mnt/DiskD/Projects/sipkmk-mandor-mobile
+VITE_API_BASE=http://curious-lime-sloth.101-50-1-74.cpanel.site/api npm run build
+export CLOUDFLARE_API_TOKEN='<token>'
+export CLOUDFLARE_ACCOUNT_ID='4a7d3bef1e03585177e274194cab3aa7'
+npx --yes wrangler@3.99.0 pages deploy dist --project-name=sipkmk-mandor --branch=master
+```
+URL produksi: https://sipkmk-mandor.pages.dev
+
+### Mengaktifkan CI kembali
+Buat token CF baru tanpa IP restriction (permission: Account → Cloudflare Pages → Edit), simpan sebagai
+GitHub Secrets `CLOUDFLARE_API_TOKEN` & `CLOUDFLARE_ACCOUNT_ID`, lalu restore workflow:
+`git show 4b2ced0:.github/workflows/deploy.yml > .github/workflows/deploy.yml` (dari repo lama) atau tulis ulang.
