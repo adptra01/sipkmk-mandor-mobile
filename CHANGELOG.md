@@ -19,3 +19,12 @@
 - Audit via `impeccable detect` (viewport 390×844): 1 finding — low contrast pada `.btn-primary` (white text on #f59e0b = 2.1:1, butuh 4.5:1).
 - Fix: teks tombol primer diubah ke `var(--text)` (#1f2937, ~8:1), tombol danger ke `#dc2626` + white (5.0:1).
 - Re-audit: 0 findings. `npm test` 11/11 lolos, `npm run build` sukses (PWA precache 7 entry). Ter-push ke `adptra01/sipkmk-mandor-mobile`.
+
+## 2026-11-19 — Hardening offline-first & audit a11y
+- Hardening: race condition guard (in-flight lock + queued sync), per-user outbox scoping, 401 handling + auto-logout, photo upload ke /api/photos (best-effort), AbortController timeout (15s/30s), cache master refresh saat daring.
+- Hardening: validasi input terpusat (`validateUsageInput`), tanggal lokal (`getLocalDateString`), code-splitting (vendor-react, vendor-dexie), Workbox runtime caching host-agnostik.
+- A11y: hapus emoji → SVG icon, `:focus-visible`, `prefers-reduced-motion`, `env(safe-area-inset-*)`, `touch-action: manipulation`, `tabular-nums`.
+- Fixed: AuthContext pisah `initializing` (boot) vs `submitting` (form) → form login tidak ter-reset saat gagal.
+- Fixed: `watchPending` re-export di sync.js untuk kompatibilitas.
+- Verified: `npm test` 11/11, `npm run build` sukses (PWA precache 7 entry).
+- Deploy: CF Pages `https://sipkmk-mandor.pages.dev` (bundle HTTPS, sw.js 200).
