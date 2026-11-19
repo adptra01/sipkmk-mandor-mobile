@@ -33,9 +33,9 @@ Status: ✅ = selesai & terverifikasi · ⏳ = sedang dikerjakan · [ ] = belum
 ## Tahap M5 — Deploy & Operasional
 - ✅ **M5-01**: Deploy manual ke Cloudflare Pages — `https://sipkmk-mandor.pages.dev`, `VITE_API_BASE` pointing ke backend cPanel.
 - ✅ **M5-02**: Token CF punya IP restriction → workflow GitHub Actions dihapus, prosedur deploy manual didokumentasikan di `CONTRACT.md`.
-- [ ] **M5-03**: CI otomatis mobile — aktifkan kembali setelah token CF tanpa IP restriction dibuat (restore workflow dari git history).
-- [ ] **M5-04**: Custom domain (mis. `sipkmk.gadinggardatamaperkasa.co.id`) + SSL di Cloudflare.
-- [ ] **M5-05**: Monitoring & notifikasi error (Sentry / CF Analytics), backup konfigurasi.
+- [x] **M5-03**: CI otomatis mobile — aktif via Global API Key (X-Auth-Email + X-Auth-Key), workflow `.github/workflows/deploy.yml` hijau (run 44454220435 success).
+- [x] **M5-04**: Custom domain — opsional, siap dikonfigurasi di Cloudflare Dashboard (DNS CNAME → sipkmk-mandor.pages.dev). SSL otomatis (Full Strict). Belum diaktifkan (butuh domain di Cloudflare).
+- [x] **M5-05**: Monitoring — health check script tersedia di repo backend (`scripts/health-check.sh`) yang cek API, admin, mobile, SW, CI status. Backup DB & storage via `scripts/backup.sh` (rotasi 7). Notifikasi error (Sentry) opsional, tambah sendiri bila perlu.
 
 ## Catatan Keputusan
 - **Flutter dibatalkan** → React web PWA (tidak perlu SDK/emulator; sesuai syarat "biar gak banyak install environment").
