@@ -262,3 +262,31 @@ button:focus:not(:focus-visible) { outline: none; }
 
 /* ── Tabular nums for numbers ── */
 .card-value, .badge { font-variant-numeric: tabular-nums; }
+
+/* ── Responsive: Tablet (640px+) ── */
+@media (min-width: 640px) {
+  .app-shell { max-width: 640px; }
+  .main-content { padding: 20px 20px calc(var(--nav-h) + 20px); }
+  .card-row { gap: 16px; }
+  .form-group { margin-bottom: 16px; }
+  .btn { padding: 12px 20px; font-size: 15px; }
+}
+
+/* ── Responsive: Desktop (1024px+) ── */
+@media (min-width: 1024px) {
+  .app-shell { max-width: 768px; box-shadow: 0 0 40px rgba(0,0,0,.12); }
+  .header { padding: 0 24px; }
+  .main-content { padding: 24px 24px calc(var(--nav-h) + 24px); }
+  .card { padding: 20px; }
+  .card-value { font-size: 32px; }
+  .form-control { padding: 12px 14px; font-size: 15px; }
+  .bottom-nav a { font-size: 12px; }
+}
+
+/* ── Safe area (notch) ── */
+@supports (padding: max(0px)) {
+  .app-shell {
+    padding-top: max(0px, env(safe-area-inset-top));
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+  }
+}
