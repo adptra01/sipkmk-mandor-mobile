@@ -27,7 +27,15 @@ body {
   font-size: 15px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  overflow-x: hidden;
 }
+/* safe area */
+.app-shell { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+/* focus visible */
+:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+button:focus:not(:focus-visible) { outline: none; }
 
 /* ── App shell (mobile-first, centered on desktop) ── */
 #root {
@@ -154,6 +162,7 @@ body {
   color: var(--text);
   outline: none;
 }
+.form-control:focus-visible { border-color: var(--amber); box-shadow: 0 0 0 3px var(--amber-light); outline: none; }
 .form-control:focus { border-color: var(--amber); box-shadow: 0 0 0 3px var(--amber-light); }
 
 /* ── Badges ── */
@@ -245,3 +254,11 @@ body {
 .sync-stat { flex: 1; text-align: center; padding: 12px; border-radius: 8px; background: var(--surface); box-shadow: var(--shadow); }
 .sync-stat-value { font-size: 24px; font-weight: 700; }
 .sync-stat-label { font-size: 11px; color: var(--text-muted); }
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+/* ── Tabular nums for numbers ── */
+.card-value, .badge { font-variant-numeric: tabular-nums; }

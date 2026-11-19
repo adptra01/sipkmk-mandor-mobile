@@ -51,7 +51,7 @@ export default function SyncScreen() {
       <div className="section-title">Sinkronisasi Data</div>
 
       <button className="btn btn-primary btn-full" onClick={handleSync} disabled={syncing}>
-        {syncing ? 'Menyinkronkan...' : '🔄 Sinkronkan Sekarang'}
+        {syncing ? 'Menyinkronkan...' : 'Sinkronkan Sekarang'}
       </button>
 
       {result && (

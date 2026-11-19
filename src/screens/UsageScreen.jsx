@@ -214,7 +214,7 @@ export default function UsageScreen() {
                 style={{ maxWidth: '100%', maxHeight: 180, borderRadius: 6, objectFit: 'cover' }}
               />
               <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 4 }}>
-                📷 {photoFile?.name} · {(photoFile?.size / 1024).toFixed(0)} KB
+                {photoFile?.name} · {(photoFile?.size / 1024).toFixed(0)} KB
               </div>
             </div>
           )}

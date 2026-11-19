@@ -48,11 +48,11 @@ export default function HomeScreen() {
       </div>
 
       <button className="btn btn-primary btn-full" onClick={handleSync} disabled={syncing}>
-        {syncing ? 'Menyinkronkan...' : '🔄 Sinkronkan Sekarang'}
+        {syncing ? 'Menyinkronkan...' : 'Sinkronkan Sekarang'}
       </button>
 
       <button className="btn btn-secondary btn-full" onClick={() => navigate('/pemakaian')}>
-        📋 Catat Pemakaian Material
+        Catat Pemakaian Material
       </button>
     </div>
   );
