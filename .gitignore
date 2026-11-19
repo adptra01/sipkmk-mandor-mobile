@@ -1,8 +1,10 @@
-node_modules/
-dist/
 .dev-dist/
-.wrangler/
-*.log
+dev-dist/
+dist/
+.DS_Store
 .env
 .env.*
-.DS_Store
+*.log
+node_modules/
+test-results/
+.wrangler/
