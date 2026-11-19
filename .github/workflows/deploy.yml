@@ -33,5 +33,5 @@ jobs:
           VITE_API_BASE: https://curious-lime-sloth.101-50-1-74.cpanel.site/api
         run: npm run build
 
-      - name: Deploy ke Cloudflare Pages (REST API, tanpa wrangler)
+      - name: Deploy ke Cloudflare Pages
         run: bash deploy-pages.sh
