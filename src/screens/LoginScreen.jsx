@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 export default function LoginScreen() {
-  const { login, loading, error } = useAuth();
+  const { login, submitting, error } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -52,8 +52,8 @@ export default function LoginScreen() {
               autoComplete="current-password"
             />
           </div>
-          <button className="btn btn-primary btn-full" type="submit" disabled={loading}>
-            {loading ? 'Memproses...' : 'Masuk'}
+          <button className="btn btn-primary btn-full" type="submit" disabled={submitting}>
+            {submitting ? 'Memproses...' : 'Masuk'}
           </button>
         </form>
       </div>

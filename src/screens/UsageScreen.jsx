@@ -4,8 +4,9 @@ import { db, addOutbox, cacheMaster } from '../lib/db';
 import { getMaterials, getProjects } from '../lib/api';
 import { syncNow } from '../lib/sync';
 import { compressPhoto, fileToDataUrl } from '../lib/photo';
+import { getLocalDateString, validateUsageInput } from '../lib/payload';
 
-const TODAY = new Date().toISOString().slice(0, 10);
+const TODAY = getLocalDateString();
 
 const DEST_TYPES = [
   { value: 'App\\Models\\HousingUnit', label: 'Unit Rumah' },
@@ -94,11 +95,8 @@ export default function UsageScreen() {
 
   async function handleSave(e) {
     e.preventDefault();
-    if (!projectId) { setMsg('Pilih proyek terlebih dahulu.'); return; }
-    if (items.some(it => !it.materialId || !it.quantity)) {
-      setMsg('Lengkapi semua baris material.');
-      return;
-    }
+    const vErr = validateUsageInput({ projectId, warehouseId, destinationType: destType, destinationId: destId, items });
+    if (vErr) { setMsg(vErr); return; }
 
     const payload = {
       uuid: crypto.randomUUID(),

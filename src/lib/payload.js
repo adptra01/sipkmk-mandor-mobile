@@ -52,3 +52,35 @@ export function buildSyncPayload(row = {}) {
 export function nextStatus(current, success) {
   return success ? 'synced' : 'failed';
 }
+
+/**
+ * Tanggal lokal (YYYY-MM-DD) tanpa zona UTC — mencegah tanggal mundur dini hari WIB.
+ */
+export function getLocalDateString(date = new Date()) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+/**
+ * Validasi input pemakaian sebelum disimpan ke outbox.
+ * @returns {string|null} Pesan error (Bahasa Indonesia) bila tidak valid, null bila OK.
+ */
+export function validateUsageInput({ projectId, warehouseId, destinationType, destinationId, items }) {
+  if (!projectId || Number(projectId) <= 0) return 'Pilih proyek terlebih dahulu.';
+  if (!warehouseId || Number(warehouseId) <= 0) return 'ID gudang harus angka positif.';
+  if (!destinationType || !['App\\Models\\HousingUnit', 'App\\Models\\CostPool'].includes(destinationType)) {
+    return 'Tipe tujuan tidak valid.';
+  }
+  if (!destinationId || Number(destinationId) <= 0) return 'ID tujuan harus angka positif.';
+  if (!Array.isArray(items) || items.length === 0) return 'Minimal satu material harus dicatat.';
+  const seen = new Set();
+  for (const it of items) {
+    if (!it.materialId) return 'Pilih material pada setiap baris.';
+    if (seen.has(it.materialId)) return 'Material tidak boleh duplikat.';
+    seen.add(it.materialId);
+    if (!it.quantity || Number(it.quantity) <= 0) return 'Kuantitas harus lebih dari nol.';
+  }
+  return null;
+}

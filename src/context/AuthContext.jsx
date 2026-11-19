@@ -1,19 +1,22 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { login as apiLogin, me, getToken, clearToken } from '../lib/api';
+import { login as apiLogin, me, getToken, clearToken, onUnauthorized } from '../lib/api';
+import { clearMasterCache } from '../lib/db';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setTokenState] = useState(getToken());
-  const [loading, setLoading] = useState(true);
+  const [initializing, setInitializing] = useState(true); // boot check /me
+  const [submitting, setSubmitting] = useState(false); // submit form login
   const [error, setError] = useState(null);
 
+  // Validasi token tersimpan saat boot.
   useEffect(() => {
     let aktif = true;
     (async () => {
       if (!getToken()) {
-        setLoading(false);
+        if (aktif) setInitializing(false);
         return;
       }
       try {
@@ -26,7 +29,7 @@ export function AuthProvider({ children }) {
           setTokenState(null);
         }
       } finally {
-        if (aktif) setLoading(false);
+        if (aktif) setInitializing(false);
       }
     })();
     return () => {
@@ -34,8 +37,19 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
+  // 401 dari API → bersihkan sesi & arahkan ulang ke login (data outbox tetap aman).
+  useEffect(() => {
+    const off = onUnauthorized(() => {
+      clearToken();
+      setTokenState(null);
+      setUser(null);
+      setError('Sesi berakhir. Silakan masuk lagi.');
+    });
+    return off;
+  }, []);
+
   async function login(email, password) {
-    setLoading(true);
+    setSubmitting(true);
     setError(null);
     try {
       const data = await apiLogin(email, password);
@@ -46,19 +60,24 @@ export function AuthProvider({ children }) {
       setError(e.message);
       throw e;
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   }
 
   function logout() {
+    // best-effort revoke token di server
+    import('../lib/api').then(({ apiRequest }) => {
+      apiRequest('/logout', { method: 'POST' }).catch(() => {});
+    });
     clearToken();
+    clearMasterCache().catch(() => {});
     setUser(null);
     setTokenState(null);
     setError(null);
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, error, login, logout }}>
+    <AuthContext.Provider value={{ user, token, initializing, submitting, error, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

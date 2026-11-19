@@ -7,9 +7,9 @@ import UsageScreen from './screens/UsageScreen';
 import SyncScreen from './screens/SyncScreen';
 
 export default function App() {
-  const { user, loading } = useAuth();
+  const { user, initializing } = useAuth();
 
-  if (loading) {
+  if (initializing) {
     return (
       <div className="loader-fullscreen">
         <div className="spinner" />

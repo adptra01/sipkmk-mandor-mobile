@@ -1,6 +1,3 @@
-// Bisa dioverride saat build: VITE_API_BASE=https://domain/api npm run build
-// Default produksi = backend di hosting cPanel (WAJIB https: halaman Pages juga https,
-// Mixed Content memblokir request http dari halaman https).
 export const API_BASE = import.meta.env.VITE_API_BASE || 'https://curious-lime-sloth.101-50-1-74.cpanel.site/api';
 
 const TOKEN_KEY = 'sipkmk_token';
@@ -8,36 +5,60 @@ const TOKEN_KEY = 'sipkmk_token';
 export function setToken(t) {
   localStorage.setItem(TOKEN_KEY, t);
 }
-
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY);
 }
-
 export function clearToken() {
   localStorage.removeItem(TOKEN_KEY);
 }
 
-export async function apiRequest(path, { method = 'GET', body, auth = true } = {}) {
+// Event bus sederhana untuk 401 → AuthContext membersihkan sesi.
+const UNAUTHORIZED_EVENT = 'sipkmk:unauthorized';
+export function onUnauthorized(cb) {
+  window.addEventListener(UNAUTHORIZED_EVENT, cb);
+  return () => window.removeEventListener(UNAUTHORIZED_EVENT, cb);
+}
+
+export class ApiError extends Error {
+  constructor(message, status, data) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.data = data;
+  }
+}
+
+export async function apiRequest(path, { method = 'GET', body, auth = true, timeout = 15000 } = {}) {
   const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };
   if (auth) {
     const token = getToken();
     if (token) headers.Authorization = `Bearer ${token}`;
   }
-  const res = await fetch(`${API_BASE}${path}`, {
-    method,
-    headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
-  let data = null;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeout);
   try {
-    data = await res.json();
-  } catch {
-    // respons bukan JSON (mis. error HTML dari server)
+    const res = await fetch(`${API_BASE}${path}`, {
+      method,
+      headers,
+      body: body === undefined ? undefined : JSON.stringify(body),
+      signal: ctrl.signal,
+    });
+    let data = null;
+    try { data = await res.json(); } catch { /* bukan JSON */ }
+    if (!res.ok) {
+      if (res.status === 401 && auth) {
+        clearToken();
+        window.dispatchEvent(new CustomEvent(UNAUTHORIZED_EVENT));
+      }
+      throw new ApiError((data && (data.pesan || data.message)) || 'Permintaan gagal', res.status, data);
+    }
+    return data;
+  } catch (e) {
+    if (e.name === 'AbortError') throw new ApiError('Koneksi timeout. Periksa jaringan.', 0, null);
+    throw e;
+  } finally {
+    clearTimeout(timer);
   }
-  if (!res.ok) {
-    throw new Error((data && (data.pesan || data.message)) || 'Permintaan gagal');
-  }
-  return data;
 }
 
 export async function login(email, password) {
@@ -56,8 +77,6 @@ export async function me() {
 
 export async function getMaterials() {
   const rows = await apiRequest('/materials');
-  // Backend memakai Resource berbahasa Indonesia (kode/nama/satuan/...).
-  // Normalisasi ke field internal agar UI tidak bergantung pada bahasa respons API.
   return (Array.isArray(rows) ? rows : rows?.data ?? []).map((m) => ({
     id: m.id,
     code: m.kode ?? m.code,
@@ -75,5 +94,38 @@ export async function getProjects() {
 }
 
 export async function syncUsage(payload) {
-  return apiRequest('/sync/usages', { method: 'POST', body: payload });
+  return apiRequest('/sync/usages', { method: 'POST', body: payload, timeout: 30000 });
+}
+
+export async function uploadPhoto(file, usageUuid) {
+  const fd = new FormData();
+  fd.append('photo', file);
+  if (usageUuid) fd.append('usage_uuid', usageUuid);
+  const token = getToken();
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 30000);
+  try {
+    const res = await fetch(`${API_BASE}/photos`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: fd,
+      signal: ctrl.signal,
+    });
+    let data = null;
+    try { data = await res.json(); } catch { /* bukan JSON */ }
+    if (!res.ok) {
+      if (res.status === 401) { clearToken(); window.dispatchEvent(new CustomEvent(UNAUTHORIZED_EVENT)); }
+      throw new ApiError((data && (data.pesan || data.message)) || 'Upload foto gagal', res.status, data);
+    }
+    return data;
+  } catch (e) {
+    if (e.name === 'AbortError') throw new ApiError('Upload timeout. Periksa jaringan.', 0, null);
+    throw e;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+export function isIdempotentReplayStatus(status) {
+  return status === 409;
 }
