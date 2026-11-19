@@ -13,3 +13,9 @@
 - Flutter **dibatalkan** → React web PWA (tanpa SDK/emulator, sesuai syarat "biar gak banyak install environment").
 - React Native/Expo tidak dipakai di MVP (opsi konversi via EAS Build tetap terbuka).
 - Model AI yang dipakai untuk pengembangan: Claude Sonnet, GPT-6 Luna, Qwen4-Max, Gemini-4 Argon, Kimi K3.1 Pro, Gemini-3.8-Flash (verifikasi), Beam-free (factory/seeder BE), DeepSeek-flash (fix migrasi MySQL).
+
+## 2026-11-19 — Impeccable design skill + a11y fix
+- Installed `impeccable.style` skill (v4.9.1) into `.opencode/skills/impeccable/` (43 reference playbooks + detector CLI).
+- Audit via `impeccable detect` (viewport 390×844): 1 finding — low contrast pada `.btn-primary` (white text on #f59e0b = 2.1:1, butuh 4.5:1).
+- Fix: teks tombol primer diubah ke `var(--text)` (#1f2937, ~8:1), tombol danger ke `#dc2626` + white (5.0:1).
+- Re-audit: 0 findings. `npm test` 11/11 lolos, `npm run build` sukses (PWA precache 7 entry). Ter-push ke `adptra01/sipkmk-mandor-mobile`.
