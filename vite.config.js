@@ -46,6 +46,17 @@ export default defineConfig({
       devOptions: { enabled: true },
     }),
   ],
-  server: { host: '0.0.0.0', port: 5173 },
+  server: {
+    host: '0.0.0.0',
+    port: 5173,
+    proxy: {
+      '/api': {
+        target: 'http://curious-lime-sloth.101-50-1-74.cpanel.site',
+        changeOrigin: true,
+        secure: false,
+        headers: { Cookie: 'cpanel_tech_domain=1' },
+      },
+    },
+  },
   build: { outDir: 'dist' },
 });

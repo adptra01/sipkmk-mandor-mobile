@@ -149,7 +149,7 @@ export default function UsageScreen() {
       <form onSubmit={handleSave}>
         <div className="form-group">
           <label className="form-label">Proyek</label>
-          <select className="form-control" value={projectId} onChange={e => setProjectId(e.target.value)} required>
+          <select className="form-control" data-testid="project-select" value={projectId} onChange={e => setProjectId(e.target.value)} required>
             <option value="">-- Pilih Proyek --</option>
             {projects.map(p => <option key={p.id} value={p.id}>{p.name || p.code}</option>)}
           </select>
@@ -157,19 +157,19 @@ export default function UsageScreen() {
 
         <div className="form-group">
           <label className="form-label">ID Gudang</label>
-          <input className="form-control" type="number" min="1" value={warehouseId} onChange={e => setWarehouseId(e.target.value)} required />
+          <input className="form-control" type="number" min="1" data-testid="warehouse-input" value={warehouseId} onChange={e => setWarehouseId(e.target.value)} required />
         </div>
 
         <div className="form-group">
           <label className="form-label">Tujuan</label>
-          <select className="form-control" value={destType} onChange={e => setDestType(e.target.value)}>
+          <select className="form-control" data-testid="dest-type-select" value={destType} onChange={e => setDestType(e.target.value)}>
             {DEST_TYPES.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
           </select>
         </div>
 
         <div className="form-group">
           <label className="form-label">ID Tujuan</label>
-          <input className="form-control" type="number" min="1" value={destId} onChange={e => setDestId(e.target.value)} required />
+          <input className="form-control" type="number" min="1" data-testid="dest-id-input" value={destId} onChange={e => setDestId(e.target.value)} required />
         </div>
 
         <div className="form-group">
@@ -181,11 +181,11 @@ export default function UsageScreen() {
           <label className="form-label">Material</label>
           {items.map((it, i) => (
             <div className="item-row" key={i}>
-              <select className="form-control" value={it.materialId} onChange={e => setItem(i, 'materialId', e.target.value)} required>
+              <select className="form-control" data-testid="material-select" value={it.materialId} onChange={e => setItem(i, 'materialId', e.target.value)} required>
                 <option value="">-- Pilih --</option>
                 {materials.map(m => <option key={m.id} value={m.id}>{m.name} ({m.unit})</option>)}
               </select>
-              <input className="form-control form-control-sm" type="number" min="0.01" step="any" placeholder="Qty" value={it.quantity} onChange={e => setItem(i, 'quantity', e.target.value)} required />
+              <input className="form-control form-control-sm" type="number" min="0.01" step="any" placeholder="Qty" data-testid="qty-input" value={it.quantity} onChange={e => setItem(i, 'quantity', e.target.value)} required />
               <button type="button" className="btn-remove" onClick={() => removeItem(i)}>×</button>
             </div>
           ))}

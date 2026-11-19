@@ -31,6 +31,7 @@ export default function LoginScreen() {
             <input
               className="form-control"
               type="email"
+              data-testid="email-input"
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="admin@sipkmk.local"
@@ -43,6 +44,7 @@ export default function LoginScreen() {
             <input
               className="form-control"
               type="password"
+              data-testid="password-input"
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="••••••••"
